@@ -1,0 +1,22 @@
+# Configuracoes de Trading
+symbols:
+  - "EURUSD"
+  - "GBPUSD"
+  - "USDJPY"
+  - "AUDCAD"
+  - "BTCUSD"
+
+timeframe: "5m"
+risk_amount: 4.0
+expiry_minutes: 3
+
+# IQ Option
+iq_option:
+  email: "seu-email@exemplo.com"
+  password: "sua-senha-aqui"
+  mode: "REAL"
+
+# Telegram
+telegram:
+  bot_token: "seu-bot-token"
+  chat_id: "seu-chat-id"

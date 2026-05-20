@@ -1,0 +1,26 @@
+services:
+  bot:
+    build:
+      context: ./smc_iq_bot
+      dockerfile: Dockerfile
+    container_name: smc-iq-bot
+    restart: unless-stopped
+    working_dir: /app
+    command: ["python", "main.py"]
+    volumes:
+      - ./smc_iq_bot/config/settings.yaml:/app/config/settings.yaml:ro
+      - ./smc_iq_bot/logs:/app/logs
+
+  dashboard:
+    build:
+      context: ./smc_iq_bot
+      dockerfile: Dockerfile
+    container_name: smc-iq-dashboard
+    restart: unless-stopped
+    working_dir: /app
+    command: ["streamlit", "run", "dashboard/app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./smc_iq_bot/config/settings.yaml:/app/config/settings.yaml:ro
+      - ./smc_iq_bot/logs:/app/logs

@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+
+# Streamlit
+.streamlit/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Secrets / local config
+.env
+.env.*
+smc_iq_bot/.env
+smc_iq_bot/.env.*
+smc_iq_bot/config/settings.yaml
+config/settings.local.yaml
+*.secret
+*.env
+
+# Runtime artifacts
+*.log
+*.pid
+smc_iq_bot/logs/
+smc_iq_bot/bot.log
+smc_iq_bot/dashboard.log
+
+# Docker
+smc_iq_bot/.docker/
