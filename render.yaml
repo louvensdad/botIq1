@@ -1,0 +1,37 @@
+services:
+  - name: botiq1-worker
+    type: worker
+    runtime: docker
+    plan: starter
+    dockerContext: ./smc_iq_bot
+    dockerfilePath: ./smc_iq_bot/Dockerfile
+    dockerCommand: python main.py
+    autoDeploy: true
+    envVars:
+      - key: SYMBOLS
+        value: EURUSD,GBPUSD,USDJPY,AUDCAD,BTCUSD
+      - key: TIMEFRAME
+        value: 5m
+      - key: RISK_AMOUNT
+        value: "4.0"
+      - key: EXPIRY_MINUTES
+        value: "3"
+      - key: IQ_OPTION_EMAIL
+        sync: false
+      - key: IQ_OPTION_PASSWORD
+        sync: false
+      - key: IQ_OPTION_MODE
+        value: REAL
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+
+  - name: botiq1-dashboard
+    type: web
+    runtime: docker
+    plan: free
+    dockerContext: ./smc_iq_bot
+    dockerfilePath: ./smc_iq_bot/Dockerfile
+    dockerCommand: sh -c 'streamlit run dashboard/app.py --server.address 0.0.0.0 --server.port ${PORT:-8501}'
+    autoDeploy: true

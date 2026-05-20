@@ -1,17 +1,68 @@
-import yaml
+import os
 import time
+from datetime import datetime
+
 import pandas as pd
 import yfinance as yf
-from datetime import datetime
+import yaml
 
 from core.indicators import get_all_indicators, check_smc_confluence
 from execution.iq_option_executor import IQOptionExecutor
 from alerts.telegram_bot import TelegramAlerter
 
 
+def _load_yaml_config():
+    config_path = os.path.join("config", "settings.yaml")
+    if not os.path.exists(config_path):
+        return {}
+
+    with open(config_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
+def _get_env_list(name: str, default: list[str]) -> list[str]:
+    value = os.getenv(name, "").strip()
+    if not value:
+        return default
+    return [item.strip().upper() for item in value.split(",") if item.strip()]
+
+
+def _get_env_float(name: str, default: float) -> float:
+    value = os.getenv(name)
+    return float(value) if value not in (None, "") else default
+
+
+def _get_env_int(name: str, default: int) -> int:
+    value = os.getenv(name)
+    return int(value) if value not in (None, "") else default
+
+
 def load_config():
-    with open("config/settings.yaml", "r") as f:
-        return yaml.safe_load(f)
+    yaml_config = _load_yaml_config()
+
+    default_symbols = yaml_config.get("symbols", ["EURUSD", "GBPUSD", "USDJPY", "AUDCAD", "BTCUSD"])
+    default_timeframe = yaml_config.get("timeframe", "5m")
+    default_risk_amount = yaml_config.get("risk_amount", 4.0)
+    default_expiry_minutes = yaml_config.get("expiry_minutes", 3)
+
+    iq_defaults = yaml_config.get("iq_option", {})
+    tg_defaults = yaml_config.get("telegram", {})
+
+    return {
+        "symbols": _get_env_list("SYMBOLS", default_symbols),
+        "timeframe": os.getenv("TIMEFRAME", default_timeframe),
+        "risk_amount": _get_env_float("RISK_AMOUNT", default_risk_amount),
+        "expiry_minutes": _get_env_int("EXPIRY_MINUTES", default_expiry_minutes),
+        "iq_option": {
+            "email": os.getenv("IQ_OPTION_EMAIL", iq_defaults.get("email", "")),
+            "password": os.getenv("IQ_OPTION_PASSWORD", iq_defaults.get("password", "")),
+            "mode": os.getenv("IQ_OPTION_MODE", iq_defaults.get("mode", "REAL")),
+        },
+        "telegram": {
+            "bot_token": os.getenv("TELEGRAM_BOT_TOKEN", tg_defaults.get("bot_token", "")),
+            "chat_id": os.getenv("TELEGRAM_CHAT_ID", tg_defaults.get("chat_id", "")),
+        },
+    }
 
 
 def map_to_yfinance(iq_symbol: str) -> str:
